@@ -1,6 +1,6 @@
 <template>
-  <div class="seller">
-    i am seller
+  <div class="goods">
+    i am goods
   </div>
 </template>
 
