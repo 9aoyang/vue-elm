@@ -18,7 +18,6 @@
 <script>
 import header from './components/header/header.vue';
 
-let str = 'str';
 export default {
   components: {
     'v-header': header
@@ -26,15 +25,12 @@ export default {
 };
 </script>
 <style lang="stylus" rel="stylesheet/stylus">
-.tab {
-  display: flex;
-  width: 100%;
-  height: 40px;
-  line-height: 40px;
-
-  .tab-item {
-    flex: 1;
-    text-align: center;
-  }
-}
+.tab
+  display flex
+  width 100%
+  height 40px
+  line-height 40px
+  .tab-item
+    flex 1
+    text-align center
 </style>

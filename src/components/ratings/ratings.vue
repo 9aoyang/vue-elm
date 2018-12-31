@@ -1,13 +1,19 @@
 <template>
-  <div class="header">我是header</div>
+  <div class="">
+    i am ratings
+  </div>
 </template>
 
 <script>
 export default {
   data() {
-    return {};
+    return {
+
+    };
   },
-  components: {}
+  components: {
+
+  }
 };
 </script>
 
