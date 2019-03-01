@@ -28,6 +28,7 @@
     <div class="background">
       <img :src="seller.avatar" width="100%" height="100%" alt="">
     </div>
+    <div class="detail"></div>
   </div>
 </template>
 <script>
@@ -163,4 +164,11 @@ export default {
     height 100%
     z-index -1
     filter blur(10px)
+  .detail
+    position fixed
+    z-index 100
+    width 100%
+    height 100%
+    overflow auto
+    background rgba(7, 17, 27, 0.8)
 </style>
