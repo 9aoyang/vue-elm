@@ -28,7 +28,7 @@
     <div class="background">
       <img :src="seller.avatar" width="100%" height="100%" alt>
     </div>
-    <div v-show="detailShow" class="detail">
+    <div v-show="detailShow" class="detail" transition="fade">
       <div class="detail-wrapper clearfix">
         <div class="detail-main">
           <h1 class="name">{{ seller.name }}</h1>
@@ -57,7 +57,7 @@
         </div>
       </div>
       <div class="detail-close">
-        <i class="icon-close"></i>
+        <i class="icon-close" @click="hideDetail"></i>
       </div>
     </div>
   </div>
@@ -82,6 +82,9 @@ export default {
   methods: {
     showDetail() {
       this.detailShow = true;
+    },
+    hideDetail() {
+      this.detailShow = false;
     }
   },
   created() {
@@ -213,7 +216,14 @@ export default {
     width 100%
     height 100%
     overflow auto
-    background rgba(7, 17, 27, 0.8)
+    transition all 0.5s linear
+    backdrop-filter blur(10px)
+    &.fade-transition
+      opacity 1
+      background rgba(7, 17, 27, 0.8)
+    &.fade-enter, &.fade-leave
+      opacity 0
+      background rgba(7, 17, 27, 0)
     .detail-wrapper
       width 100%
       min-height 100%
@@ -243,35 +253,35 @@ export default {
             font-weight 700
             font-size 14px
         .supports
-            width 80%
-            margin 0 auto
-          .support-item
-            padding 0 12px
-            margin-bottom 12px
-            font-size 0
-            &:last-child
-              margin-bottom 0
-            .icon
-              display inline-block
-              width 16px
-              height 16px
-              vertical-align top
-              margin-right 6px
-              background-size 16px 16px
-              background-repeat no-repeat
-              &.decrease
-                bg-image('decrease_2')
-              &.discount
-                bg-image('discount_2')
-              &.guarantee
-                bg-image('guarantee_2')
-              &.invoice
-                bg-image('invoice_2')
-              &.special
-                bg-image('special_2')
-            .text
-              line-height 16px
-              font-size 12px
+          width 80%
+          margin 0 auto
+        .support-item
+          padding 0 12px
+          margin-bottom 12px
+          font-size 0
+          &:last-child
+            margin-bottom 0
+          .icon
+            display inline-block
+            width 16px
+            height 16px
+            vertical-align top
+            margin-right 6px
+            background-size 16px 16px
+            background-repeat no-repeat
+            &.decrease
+              bg-image('decrease_2')
+            &.discount
+              bg-image('discount_2')
+            &.guarantee
+              bg-image('guarantee_2')
+            &.invoice
+              bg-image('invoice_2')
+            &.special
+              bg-image('special_2')
+          .text
+            line-height 16px
+            font-size 12px
         .bulletin
           width 80%
           margin 0 auto
