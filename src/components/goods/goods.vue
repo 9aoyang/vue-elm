@@ -1,6 +1,6 @@
 <template>
   <div class="goods">
-    <div class="menu-wrapper">
+    <div class="menu-wrapper" v-el:menu-wrapper>
       <ul>
         <li v-for="(index, good) in goods" :key="index" class="menu-item">
           <span class="text border-1px">
@@ -10,7 +10,7 @@
         </li>
       </ul>
     </div>
-    <div class="foods-wrapper">
+    <div class="foods-wrapper" v-el:foods-wrapper>
       <ul>
         <li v-for="(index, good) in goods" :key="index" class="foot-list">
           <h1 class="title">{{ good.name }}</h1>
@@ -41,6 +41,7 @@
 </template>
 
 <script>
+import BScroll from 'better-scroll';
 const ERR_OK = 0;
 
 export default {
@@ -60,10 +61,19 @@ export default {
       response = response.body;
       if (response.errno === ERR_OK) {
         this.goods = response.data;
+        this.$nextTick(() => {
+          this._initScroll();
+        });
       }
     });
   },
-  components: {}
+  methods: {
+    _initScroll() {
+      this.menuScroll = new BScroll(this.$els.menuWrapper, {});
+
+      this.foodsScroll = new BScroll(this.$els.foodsWrapper, {});
+    }
+  }
 };
 </script>
 
@@ -145,6 +155,7 @@ export default {
           color #93999f
         .desc
           margin-bottom 8px
+          line-height 12px
         .extra
           .count
             margin-right 12px
