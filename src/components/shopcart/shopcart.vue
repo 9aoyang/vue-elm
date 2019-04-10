@@ -1,55 +1,62 @@
 <template>
-  <div class="shopcart">
-    <div class="content" @click="toggleList">
-      <div class="content-left">
-        <div class="logo-wrapper">
-          <div class="logo" :class="{'highlight': totalCount > 0}">
-            <span class="icon-shopping_cart" :class="{'highlight': totalCount > 0}"></span>
+  <div>
+    <div
+      class="list-mask"
+      v-show="listShow"
+      @click="hideList"
+      transition="fade"></div>
+    <div class="shopcart">
+      <div class="content" @click="toggleList">
+        <div class="content-left">
+          <div class="logo-wrapper">
+            <div class="logo" :class="{'highlight': totalCount > 0}">
+              <span class="icon-shopping_cart" :class="{'highlight': totalCount > 0}"></span>
+            </div>
+            <div class="num" v-show="total > 0">{{ totalCount }}</div>
           </div>
-          <div class="num" v-show="total > 0">{{ totalCount }}</div>
+          <div class="price" :class="{'highlight': totalPrice > 0}">￥{{ totalPrice }}</div>
+          <div class="desc">另需配送费￥{{ deliveryPrice }}元</div>
         </div>
-        <div class="price" :class="{'highlight': totalPrice > 0}">￥{{ totalPrice }}</div>
-        <div class="desc">另需配送费￥{{ deliveryPrice }}元</div>
-      </div>
-      <div class="content-right">
-        <div class="pay" :class="payClass">
-          {{ payDesc }}
+        <div class="content-right" @click.stop.prevent="pay">
+          <div class="pay" :class="payClass">{{ payDesc }}</div>
         </div>
       </div>
-    </div>
-    <div class="ball-container">
-      <div
-        transition="drop"
-        class="ball"
-        v-for="(index, ball) in balls"
-        v-show="ball.show"
-        :key="index">
-        <div class="inner inner-hook"></div>
+      <div class="ball-container">
+        <div
+          transition="drop"
+          class="ball"
+          v-for="(index, ball) in balls"
+          v-show="ball.show"
+          :key="index"
+        >
+          <div class="inner inner-hook"></div>
+        </div>
       </div>
-    </div>
-    <div class="shopcart-list" v-show="listShow" transition="fold">
-      <div class="list-header">
-        <h1 class="title">购物车</h1>
-        <span class="empty">清空</span>
-      </div>
-      <div class="list-content">
-        <ul>
-          <li class="food" v-for="(index, food) in selectFoods" :key="index">
-            <span class="name">{{ food.name }}</span>
-            <div class="price">
-              <span>￥{{ food.price * food.count }}</span>
-            </div>
-            <div class="cartcontrol-wrapper">
-              <cartcontrol :food="food"></cartcontrol>
-            </div>
-          </li>
-        </ul>
+      <div class="shopcart-list" v-show="listShow" transition="fold">
+        <div class="list-header">
+          <h1 class="title">购物车</h1>
+          <span class="empty" @click="empty">清空</span>
+        </div>
+        <div class="list-content" v-el:list-content>
+          <ul>
+            <li class="food" v-for="(index, food) in selectFoods" :key="index">
+              <span class="name">{{ food.name }}</span>
+              <div class="price">
+                <span>￥{{ food.price * food.count }}</span>
+              </div>
+              <div class="cartcontrol-wrapper">
+                <cartcontrol :food="food"></cartcontrol>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import BScroll from 'better-scroll';
 import cartcontrol from 'components/cartcontrol/cartcontrol';
 
 export default {
@@ -57,10 +64,12 @@ export default {
     selectFoods: {
       type: Array,
       default() {
-        return [{
-          price: 10,
-          count: 1
-        }];
+        return [
+          {
+            price: 10,
+            count: 1
+          }
+        ];
       }
     },
     deliveryPrice: {
@@ -95,14 +104,10 @@ export default {
   },
   computed: {
     totalPrice() {
-      return this.selectFoods.reduce((total, food) =>
-        total += food.price * food.count
-      , 0);
+      return this.selectFoods.reduce((total, food) => (total += food.price * food.count), 0);
     },
     totalCount() {
-      return this.selectFoods.reduce((count, food) =>
-        count += food.count
-      , 0);
+      return this.selectFoods.reduce((count, food) => (count += food.count), 0);
     },
     payDesc() {
       if (this.totalPrice === 0) {
@@ -123,6 +128,18 @@ export default {
         return false;
       }
       const show = !this.fold;
+
+      if (show) {
+        this.$nextTick(() => {
+          if (!this.scroll) {
+            this.scroll = new BScroll(this.$els.listContent, {
+              click: true
+            });
+          } else {
+            this.scroll.refresh();
+          }
+        });
+      }
       return show;
     }
   },
@@ -145,6 +162,21 @@ export default {
       if (!this.totalCount) return;
 
       this.fold = !this.fold;
+    },
+    empty() {
+      this.selectFoods.forEach(food => {
+        food.count = 0;
+      });
+    },
+    hideList() {
+      this.fold = true;
+    },
+    pay() {
+      if (this.totalPrice < this.minPrice) {
+        return;
+      } else {
+        window.alert(`支付${this.totalPrice}`);
+      }
     }
   },
   transitions: {
@@ -191,7 +223,22 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-@import "../../common/stylus/mixin.styl";
+@import '../../common/stylus/mixin.styl'
+.list-mask
+  position fixed
+  top 0
+  left 0
+  width 100%
+  height 100%
+  z-index 40
+  backdrop-filter blur(10px)
+  &.fade-transition
+    transition all 0.5s
+    opacity 1
+    background rgba(7, 17, 27, 0.6)
+  &.fade-enter, &.fade-leave
+    opacity 0
+    background rgba(7, 17, 27, 0)
 .shopcart
   position fixed
   left 0
@@ -210,7 +257,6 @@ export default {
         display inline-block
         vertical-align top
         box-sizing border-box
-
       .logo-wrapper
         position relative
         top -10px
@@ -256,7 +302,6 @@ export default {
         font-weight 700
         &.highlight
           color #fff
-
       .desc
         line-height 24px
         margin 12px 0 0 12px
