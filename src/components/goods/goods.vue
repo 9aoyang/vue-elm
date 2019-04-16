@@ -21,7 +21,11 @@
         <li v-for="(index, good) in goods" :key="index" class="food-list food-list-hook">
           <h1 class="title">{{ good.name }}</h1>
           <ul>
-            <li v-for="(index, food) in good.foods" :key="index" class="food-item border-1px">
+            <li
+              @click="selectFood(food, $event)"
+              v-for="(index, food) in good.foods"
+              :key="index"
+              class="food-item border-1px">
               <div class="icon">
                 <img width="57" height="57" alt="food" :src="food.icon">
               </div>
@@ -47,9 +51,11 @@
     </div>
     <shopcart
       v-ref:shopcart
-      :select-foods="selectFoods"
+      :select-foods="eds"
       :delivery-price="seller.deliveryPrice"
-      :min-price="seller.minPrice"></shopcart>
+      :min-price="seller.minPrice">
+    </shopcart>
+    <food :food="selectedFood" v-ref:food></food>
   </div>
 </template>
 
@@ -57,6 +63,8 @@
 import BScroll from 'better-scroll';
 import shopcart from 'components/shopcart/shopcart';
 import cartcontrol from 'components/cartcontrol/cartcontrol';
+import food from 'components/food/food';
+
 const ERR_OK = 0;
 
 export default {
@@ -68,7 +76,8 @@ export default {
   },
   components: {
     shopcart,
-    cartcontrol
+    cartcontrol,
+    food
   },
   events: {
     'cart.add'(target) {
@@ -79,7 +88,8 @@ export default {
     return {
       goods: [],
       listHeight: [],
-      scrollY: 0
+      scrollY: 0,
+      selectedFood: {}
     };
   },
   computed: {
@@ -93,24 +103,11 @@ export default {
       }
       return 0;
     },
-    selectFoods() {
+    eds() {
       return this.goods.reduce((foods, good) =>
         [...foods, ...good.foods.filter((food) => food.count)]
       , []);
      }
-  },
-  created() {
-    this.classMap = ['decrease', 'discount', 'special', 'invoice', 'guarantee'];
-    this.$http.get('/api/goods').then(response => {
-      response = response.body;
-      if (response.errno === ERR_OK) {
-        this.goods = response.data;
-        this.$nextTick(() => {
-          this._initScroll();
-          this._calculateHeight();
-        });
-      }
-    });
   },
   methods: {
     _initScroll() {
@@ -149,7 +146,28 @@ export default {
       this.$nextTick(() => {
         this.$refs.shopcart.drop(target);
       });
+    },
+    selectFood(food, event) {
+      if (!event._constructed) {
+        return;
+      }
+
+      this.selectedFood = food;
+      this.$refs.food.show();
     }
+  },
+  created() {
+    this.classMap = ['decrease', 'discount', 'special', 'invoice', 'guarantee'];
+    this.$http.get('/api/goods').then(response => {
+      response = response.body;
+      if (response.errno === ERR_OK) {
+        this.goods = response.data;
+        this.$nextTick(() => {
+          this._initScroll();
+          this._calculateHeight();
+        });
+      }
+    });
   }
 };
 </script>
@@ -257,7 +275,7 @@ export default {
             color rgb(147, 153, 159)
         .cartcontrol-wrapper
           position absolute
-          right 0
+          right 12px
           bottom 12px
 </style>
 
